@@ -1,0 +1,68 @@
+---
+title: "stanTEst"
+author: "Jerry Xu"
+date: "4/26/2021"
+output: html_document
+---
+```{r}
+library(dplyr)
+```
+
+
+
+```{r setup, include=FALSE}
+#library(rstan)
+
+leagueModel <- read.csv(file = "C:/Users/Devin/Desktop/Untitled Folder/FinalProject/CMWRLP1_ChampStrength_ChampWR.csv", header = TRUE)
+
+dim(leagueModel)
+head(leagueModel)
+#glm(temp3pm~ location, data =weather_WU,family =binomial)
+```
+
+```{r}
+leagueModel <- leagueModel %>%
+      mutate(TeamTwoWin = ifelse(TeamTwoWin == "Win",1,0))
+head(leagueModel["TeamTwoWin"])
+```
+
+```{r}
+train <-leagueModel[1:750,]
+test <- leagueModel[801:861,]
+
+lgtest <- glm(TeamTwoWin ~ T1P1LP  + T1P2LP +T1P3LP +T1P4LP +T1P5LP +T2P1LP +T2P2LP +T2P3LP +T2P4LP +T2P5LP +T1P1WR+T1P2WR+T1P3WR+T1P4WR+T1P5WR+T2P1WR+T2P2WR+T2P3WR+T2P4WR+T2P5WR,data = train, family = binomial(link='logit'))
+
+#the accuracy just keeps getting worse with more columns lol
+#lgtest <- glm(TeamTwoWin ~ T1P1LP  + T1P2LP +T1P3LP +T1P4LP +T1P5LP +T2P1LP +T2P2LP +T2P3LP +T2P4LP +T2P5LP +T1P1WR+T1P2WR+T1P3WR+T1P4WR+T1P5WR+T2P1WR+T2P2WR+T2P3WR+T2P4WR+T2P5WR+T1P1CM+T1P2CM+T1P3CM+T1P4CM+T1P5CM+T2P1CM+T2P2CM+T2P3CM+T2P4CM+T2P5CM+Team1P1PostChampOccurTimes+Team1P2PostChampOccurTimes+Team1P3PostChampOccurTimes+Team1P4PostChampOccurTimes+Team1P5PostChampOccurTimes+Team2P1PostChampOccurTimes+Team2P2PostChampOccurTimes+Team2P3PostChampOccurTimes+Team2P4PostChampOccurTimes+Team2P5PostChampOccurTimes+Team1P1PostPositiveScore+Team1P2PostPositiveScore+Team1P3PostPositiveScore+Team1P4PostPositiveScore+Team1P5PostPositiveScore+Team2P1PostPositiveScore+Team2P2PostPositiveScore+Team2P3PostPositiveScore+Team2P4PostPositiveScore+Team2P5PostPositiveScore+Team1P1PostNegativeScore+Team1P2PostNegativeScore+Team1P3PostNegativeScore+Team1P4PostNegativeScore+Team1P5PostNegativeScore+Team2P1PostNegativeScore+Team2P2PostNegativeScore+Team2P3PostNegativeScore+Team2P4PostNegativeScore+Team2P5PostNegativeScore+T1P1ChampWR+T1P2ChampWR+T1P3ChampWR+T1P4ChampWR+T1P5ChampWR+T2P1ChampWR+T2P2ChampWR+T2P3ChampWR+T2P4ChampWR+T2P5ChampWR,data = train, family = binomial(link='logit'))
+```
+```{r}
+summary(lgtest)
+confint(lgtest)
+```
+```{r}
+#anova(lgtest, test="Chisq")
+#1 - pchisq(8.157, df=7)
+summary(lgtest)
+```
+```{r}
+fitted.results <- predict(lgtest,newdata=subset(test,select=c(33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52)),type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != test$TeamTwoWin )
+print(paste('Accuracy',1-misClasificError))
+
+```
+```{r}
+library(ROCR)
+p <- predict(lgtest,newdata=subset(test,select=c(33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52)),type='response')
+pr <- prediction(p, test$TeamTwoWin)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+
+
+
+```
+
