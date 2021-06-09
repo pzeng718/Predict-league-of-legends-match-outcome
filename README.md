@@ -27,6 +27,21 @@
 <h5>Peter Data Files:</h5>
   comments.csv,  posts.csv,  champion_strength.csv,  champions.txt
 
+<h5>Junyi Wrangled the OP.GG data and run his files in this order:</h5>
+<ol>
+  <li><b>parse_top/mid/bottom/jg/sup.ipynb</b> - Parse raw data from OP.GG based on five champion roles.</li>
+  
+  <li><b>combineV2.ipynb</b> - combine five parsed data into one. Then add a column of corresponding maximum win rate a champion can have to our giant table.</li>
+  
+  <li><b>correlation_exp.ipynb</b> - experiment with correlation matrix heatmap.</li>
+  
+  <li><b>AdaBoost.ipynb</b> - Apply our AdaBoosting Classifier from sklearn and cross-validation.</li>
+</ol>
+<h5>Junyi Data Files:</h5>
+  all_features_parsed_bottom.csv, all_features_parsed_mid.csv, all_features_parsed_sup.csv, all_features_parsed_top.csv. all_features_parsed_jg.csv
+  all_features_parsed_concat.csv.
+
+
 <h4>Final Table used for modeling is CMWRLP1_ChampStrength_ChampWR.csv</h4>
 
 
